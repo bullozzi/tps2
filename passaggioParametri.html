@@ -2,33 +2,62 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Receiver</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <title>Sender & Receiver</title>
 
-    <div class="container">
-        <h2>Pagina Receiver</h2>
-        <p id="risultato"></p>
-    </div>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f1fa;
+        }
 
-    <script>
-        let p1 = localStorage.getItem("parametro1");
-        let p2 = localStorage.getItem("parametro2");
+        .container {
+            width: 300px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 12px rgba(90, 60, 150, 0.2);
+        }
 
-        document.getElementById("risultato").innerHTML =
-            "Parametro 1: <strong>" + p1 + "</strong><br>" +
-            "Parametro 2: <strong>" + p2 + "</strong>";
-    </script>
+        h2 {
+            text-align: center;
+            color: #5a3d9a;
+        }
 
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <title>Sender</title>
-    <link rel="stylesheet" href="style.css">
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 6px;
+            margin-top: 5px;
+            border: 1px solid #c7bce6;
+            border-radius: 4px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #5a3d9a;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 8px;
+            background-color: #5a3d9a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #432c73;
+        }
+    </style>
 </head>
 <body>
 
@@ -44,6 +73,11 @@
         <button onclick="salvaParametri()">Invia</button>
     </div>
 
+    <div class="container">
+        <h2>Pagina Receiver</h2>
+        <p id="risultato"></p>
+    </div>
+
     <script>
         function salvaParametri() {
             let p1 = document.getElementById("param1").value;
@@ -51,60 +85,21 @@
 
             localStorage.setItem("parametro1", p1);
             localStorage.setItem("parametro2", p2);
+
+            mostraRisultato();
         }
+
+        function mostraRisultato() {
+            let p1 = localStorage.getItem("parametro1");
+            let p2 = localStorage.getItem("parametro2");
+
+            document.getElementById("risultato").innerHTML =
+                "Parametro 1: <strong>" + p1 + "</strong><br>" +
+                "Parametro 2: <strong>" + p2 + "</strong>";
+        }
+
+        mostraRisultato();
     </script>
 
 </body>
 </html>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f1fa;
-}
-
-.container {
-    width: 300px;
-    margin: 100px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 0 12px rgba(90, 60, 150, 0.2);
-}
-
-h2 {
-    text-align: center;
-    color: #5a3d9a;
-}
-
-label {
-    display: block;
-    margin-top: 10px;
-    color: #444;
-}
-
-input {
-    width: 100%;
-    padding: 6px;
-    margin-top: 5px;
-    border: 1px solid #c7bce6;
-    border-radius: 4px;
-}
-
-input:focus {
-    outline: none;
-    border-color: #5a3d9a;
-}
-
-button {
-    width: 100%;
-    margin-top: 15px;
-    padding: 8px;
-    background-color: #5a3d9a;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #432c73;
-}
