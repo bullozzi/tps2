@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VELOCE — Showroom Digitale</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+</head>
+<body class="dark-theme" id="app">
+ 
+  <header class="site-header" role="banner">
+    <nav class="navbar" aria-label="Navigazione principale">
+      <a href="#home" class="logo" aria-label="VELOCE Home">
+        <span class="logo-v">V</span>ELOCE
+      </a>
+ 
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="#home" class="nav-link active" aria-current="page">Home</a></li>
+        <li><a href="#catalogo" class="nav-link">Catalogo</a></li>
+        <li><a href="#preferiti" class="nav-link">Preferiti <span class="fav-badge" id="favBadge" aria-label="preferiti salvati">0</span></a></li>
+        <li><a href="#contatti" class="nav-link">Contatti</a></li>
+      </ul>
+ 
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Cambia tema chiaro/scuro" title="Cambia tema">
+          <span class="theme-icon">☀</span>
+        </button>
+        <button class="hamburger" id="hamburger" aria-expanded="false" aria-controls="navLinks" aria-label="Apri menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+  </header>
+ 
+  <main id="main-content">
+ 
+    <section class="hero" id="home" aria-label="Benvenuto nello showroom">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">Showroom Digitale</p>
+        <h1 class="hero-title">
+          <span class="hero-line">L'eccellenza</span>
+          <span class="hero-line gold">su quattro ruote.</span>
+        </h1>
+        <p class="hero-desc">Esplora la nostra collezione esclusiva di supercar. Potenza, lusso e ingegneria al limite del possibile.</p>
+        <a href="#catalogo" class="btn btn-primary">Esplora il Catalogo</a>
+      </div>
+      <div class="hero-scroll" aria-hidden="true">
+        <span>Scorri</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+ 
+    <section class="stats-bar" aria-label="Statistiche showroom">
+      <div class="stat">
+        <span class="stat-num" data-target="48">0</span>
+        <span class="stat-label">Modelli</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" data-target="12">0</span>
+        <span class="stat-label">Marchi</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" data-target="1200">0</span>
+        <span class="stat-label">CV Massimo</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" data-target="99">0</span>
+        <span class="stat-label">Clienti Soddisfatti</span>
+      </div>
+    </section>
+ 
+    <section class="catalogo-section" id="catalogo" aria-labelledby="catalogo-title">
+      <div class="section-header">
+        <p class="section-eyebrow">La nostra selezione</p>
+        <h2 class="section-title" id="catalogo-title">Catalogo Supercar</h2>
+      </div>
+ 
+      <div class="filter-bar" role="search" aria-label="Filtri catalogo">
+        <div class="search-wrap">
+          <label for="searchInput" class="sr-only">Cerca un modello</label>
+          <input
+            type="search"
+            id="searchInput"
+            class="search-input"
+            placeholder="Cerca modello o marca…"
+            aria-label="Cerca modello o marca"
+            autocomplete="off"
+          />
+          <span class="search-icon" aria-hidden="true">⌕</span>
+        </div>
+ 
+        <div class="filter-controls">
+          <label for="filterBrand" class="sr-only">Filtra per marca</label>
+          <select id="filterBrand" class="filter-select" aria-label="Filtra per marca">
+            <option value="">Tutte le marche</option>
+          </select>
+ 
+          <label for="filterType" class="sr-only">Filtra per tipo</label>
+          <select id="filterType" class="filter-select" aria-label="Filtra per tipo">
+            <option value="">Tutti i tipi</option>
+            <option value="Coupé">Coupé</option>
+            <option value="Roadster">Roadster</option>
+            <option value="SUV">SUV</option>
+            <option value="Hypercar">Hypercar</option>
+          </select>
+ 
+          <label for="sortSelect" class="sr-only">Ordina</label>
+          <select id="sortSelect" class="filter-select" aria-label="Ordina risultati">
+            <option value="default">Ordine predefinito</option>
+            <option value="price-asc">Prezzo ↑</option>
+            <option value="price-desc">Prezzo ↓</option>
+            <option value="name-asc">Nome A→Z</option>
+            <option value="cv-desc">CV ↓</option>
+          </select>
+ 
+          <button class="btn btn-outline btn-sm" id="resetFilters" aria-label="Azzera tutti i filtri">Reset</button>
+        </div>
+      </div>
+ 
+      <p class="results-count" id="resultsCount" aria-live="polite" aria-atomic="true"></p>
+ 
+      <div class="car-grid" id="carGrid" role="list" aria-label="Lista auto">
+      </div>
+ 
+      <div class="pagination" id="pagination" role="navigation" aria-label="Paginazione"></div>
+    </section>
+ 
+    <section class="preferiti-section" id="preferiti" aria-labelledby="preferiti-title">
+      <div class="section-header">
+        <p class="section-eyebrow">La tua selezione</p>
+        <h2 class="section-title" id="preferiti-title">I tuoi Preferiti</h2>
+      </div>
+      <div class="car-grid" id="favGrid" role="list" aria-label="Lista preferiti">
+        <p class="empty-state" id="emptyFavs">Nessun preferito salvato. Aggiungi auto dal catalogo!</p>
+      </div>
+    </section>
+ 
+    <section class="contatti-section" id="contatti" aria-labelledby="contatti-title">
+      <div class="section-header">
+        <p class="section-eyebrow">Parliamo</p>
+        <h2 class="section-title" id="contatti-title">Richiedi Informazioni</h2>
+      </div>
+ 
+      <form class="contact-form" id="contactForm" novalidate aria-label="Modulo di contatto">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="inputNome" class="form-label">Nome <span aria-hidden="true">*</span></label>
+            <input type="text" id="inputNome" name="nome" class="form-input" placeholder="Es. Marco Rossi" required aria-required="true" aria-describedby="errNome" autocomplete="name" />
+            <span class="form-error" id="errNome" role="alert" aria-live="polite"></span>
+          </div>
+          <div class="form-group">
+            <label for="inputEmail" class="form-label">Email <span aria-hidden="true">*</span></label>
+            <input type="email" id="inputEmail" name="email" class="form-input" placeholder="Es. marco@email.it" required aria-required="true" aria-describedby="errEmail" autocomplete="email" />
+            <span class="form-error" id="errEmail" role="alert" aria-live="polite"></span>
+          </div>
+        </div>
+ 
+        <div class="form-group">
+          <label for="inputInteresse" class="form-label">Auto di interesse</label>
+          <select id="inputInteresse" name="interesse" class="form-input" aria-label="Seleziona auto di interesse">
+            <option value="">Seleziona un modello…</option>
+          </select>
+        </div>
+ 
+        <div class="form-group">
+          <label for="inputMessaggio" class="form-label">Messaggio <span aria-hidden="true">*</span></label>
+          <textarea id="inputMessaggio" name="messaggio" class="form-input form-textarea" placeholder="Scrivi il tuo messaggio…" required aria-required="true" aria-describedby="errMessaggio" rows="5"></textarea>
+          <span class="form-error" id="errMessaggio" role="alert" aria-live="polite"></span>
+        </div>
+ 
+        <div class="form-check">
+          <input type="checkbox" id="inputPrivacy" name="privacy" required aria-required="true" aria-describedby="errPrivacy" />
+          <label for="inputPrivacy">Accetto la <a href="#" class="link-gold">Privacy Policy</a></label>
+        </div>
+        <span class="form-error" id="errPrivacy" role="alert" aria-live="polite"></span>
+ 
+        <button type="submit" class="btn btn-primary">Invia Richiesta</button>
+      </form>
+    </section>
+ 
+  </main>
+ 
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <p class="footer-logo">VELOCE</p>
+      <p class="footer-copy">&copy; 2025 VELOCE Showroom. Tutti i diritti riservati.</p>
+      <nav aria-label="Link footer">
+        <ul class="footer-links" role="list">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#catalogo">Catalogo</a></li>
+          <li><a href="#contatti">Contatti</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+ 
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose" aria-label="Chiudi dettaglio">&times;</button>
+      <div class="modal-img-wrap">
+        <img class="modal-img" id="modalImg" src="" alt="" />
+      </div>
+      <div class="modal-body">
+        <p class="modal-brand" id="modalBrand"></p>
+        <h2 class="modal-title" id="modalTitle"></h2>
+        <p class="modal-price" id="modalPrice"></p>
+        <ul class="modal-specs" id="modalSpecs" role="list" aria-label="Specifiche tecniche"></ul>
+        <p class="modal-desc" id="modalDesc"></p>
+        <button class="btn btn-primary modal-fav-btn" id="modalFavBtn" aria-label="Aggiungi ai preferiti"></button>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+ 
+  <script src="script.js"></script>
+</body>
+</html>
