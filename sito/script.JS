@@ -1,4 +1,3 @@
-
 'use strict';
  
 function makeSVG(color1, color2, label) {
