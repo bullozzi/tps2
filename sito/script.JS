@@ -24,6 +24,41 @@ function makeSVG(color1, color2, label) {
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
  
+function makeHeroSVG() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+    <defs>
+      <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#1a0800"/>
+        <stop offset="50%" style="stop-color:#0d0600"/>
+        <stop offset="100%" style="stop-color:#1a1000"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="65%" cy="45%" r="45%">
+        <stop offset="0%" style="stop-color:#c9a84c;stop-opacity:0.18"/>
+        <stop offset="100%" style="stop-color:#000;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1400" height="900" fill="url(#bg)"/>
+    <rect width="1400" height="900" fill="url(#glow)"/>
+    <g transform="translate(320,340)" fill="rgba(201,168,76,0.08)" stroke="rgba(201,168,76,0.15)" stroke-width="1.5">
+      <ellipse cx="380" cy="180" rx="380" ry="130"/>
+      <rect x="100" y="40" width="560" height="140" rx="40"/>
+      <rect x="200" y="10" width="200" height="80" rx="20"/>
+      <rect x="420" y="10" width="180" height="80" rx="20"/>
+      <circle cx="150" cy="200" r="70" fill="rgba(0,0,0,0.5)" stroke="rgba(201,168,76,0.3)" stroke-width="3"/>
+      <circle cx="150" cy="200" r="42" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="2"/>
+      <circle cx="150" cy="200" r="16" fill="rgba(201,168,76,0.15)"/>
+      <circle cx="620" cy="200" r="70" fill="rgba(0,0,0,0.5)" stroke="rgba(201,168,76,0.3)" stroke-width="3"/>
+      <circle cx="620" cy="200" r="42" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="2"/>
+      <circle cx="620" cy="200" r="16" fill="rgba(201,168,76,0.15)"/>
+      <rect x="80" y="140" width="60" height="50" rx="5" fill="rgba(201,168,76,0.2)"/>
+      <rect x="620" y="140" width="60" height="50" rx="5" fill="rgba(201,168,76,0.2)"/>
+    </g>
+    <line x1="0" y1="450" x2="1400" y2="450" stroke="rgba(201,168,76,0.06)" stroke-width="1"/>
+    <line x1="700" y1="0" x2="700" y2="900" stroke="rgba(201,168,76,0.04)" stroke-width="1"/>
+  </svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+ 
 const CARS = [
   { id:1,  brand:'Ferrari',      model:'488 Pista',         type:'Coupé',    cv:720,  top:340, accel:2.85, price:280000,  year:2022, color:'Rosso Corsa',     img:makeSVG('#8B0000','#2a0000','Ferrari'),     desc:'La 488 Pista è l\'apice della famiglia 488. Motore V8 biturbo da 3.9L portato a 720 CV, aerodinamica mutuata dalla SF70H di Formula 1. Un capolavoro di ingegneria italiana.' },
   { id:2,  brand:'Lamborghini',  model:'Huracán EVO',        type:'Coupé',    cv:640,  top:325, accel:2.9,  price:220000,  year:2021, color:'Giallo Belén',    img:makeSVG('#7a6200','#2a2000','Lamborghini'), desc:'La Huracán EVO eleva l\'esperienza di guida con il suo V10 aspirato da 640 CV e la trazione integrale LDVI. Ogni curva diventa un\'esperienza sensoriale unica.' },
@@ -328,6 +363,9 @@ function animateCounter(elem) {
 document.addEventListener('DOMContentLoaded', () => {
   loadTheme();
   loadFavorites();
+ 
+  const heroBg = el('heroBgImg');
+  if (heroBg) heroBg.src = makeHeroSVG();
  
   const brandSel = el('filterBrand');
   [...new Set(CARS.map(c => c.brand))].sort().forEach(b => {
