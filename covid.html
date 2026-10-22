@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <title>COVID-19 Italia</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f5fa;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #174a86;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background-color: white;
+        }
+
+        th, td {
+            border: 1px solid #cccccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #174a86;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #eaf1fa;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Andamento COVID-19 in Italia</h1>
+
+    <p>Dati della Protezione Civile</p>
+
+    <p id="messaggio">Caricamento dati...</p>
+
+    <table>
+        <thead id="intestazione"></thead>
+        <tbody id="contenuto"></tbody>
+    </table>
+
+    <script>
+
+        const url = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json";
+
+        const richiesta = new XMLHttpRequest();
+
+        richiesta.open("GET", url, true);
+
+        richiesta.onreadystatechange = function() {
+
+            if (richiesta.readyState == 4) {
+
+                if (richiesta.status == 200) {
+
+                    const dati = JSON.parse(richiesta.responseText);
+
+                    const colonne = [
+                        "data",
+                        "stato",
+                        "nuovi_positivi",
+                        "totale_positivi",
+                        "terapia_intensiva",
+                        "dimessi_guariti",
+                        "deceduti",
+                        "totale_casi",
+                        "tamponi"
+                    ];
+
+                    const chiavi = Object.keys(dati[0]);
+
+                    let intestazione = "<tr>";
+
+                    chiavi.forEach(function(chiave) {
+
+                        if (colonne.includes(chiave)) {
+                            intestazione +=
+                                "<th>" + chiave + "</th>";
+                        }
+
+                    });
+
+                    intestazione += "</tr>";
+
+                    document.getElementById("intestazione")
+                        .innerHTML = intestazione;
+
+                    const ultimiDati = dati.slice(-30).reverse();
+
+                    let contenuto = "";
+
+                    ultimiDati.forEach(function(giorno) {
+
+                        contenuto += "<tr>";
+
+                        chiavi.forEach(function(chiave) {
+
+                            if (colonne.includes(chiave)) {
+
+                                let valore = giorno[chiave];
+
+                                if (valore === null) {
+                                    valore = "-";
+                                }
+
+                                if (chiave == "data") {
+                                    valore = valore.substring(0, 10);
+                                }
+
+                                contenuto +=
+                                    "<td>" + valore + "</td>";
+                            }
+
+                        });
+
+                        contenuto += "</tr>";
+
+                    });
+
+                    document.getElementById("contenuto")
+                        .innerHTML = contenuto;
+
+                    document.getElementById("messaggio")
+                        .innerHTML =
+                        "Ultime 30 rilevazioni disponibili";
+
+                } else {
+
+                    document.getElementById("messaggio")
+                        .innerHTML =
+                        "Errore nel caricamento dei dati";
+
+                }
+            }
+        };
+
+        richiesta.send();
+
+    </script>
+
+</body>
+</html>
