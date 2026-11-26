@@ -125,27 +125,65 @@
     <h3 id="risultato"></h3>
 
     <script>
-        const URL_BCE = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
+        const TASSI_RISERVA = { USD: 0.86, JPY: 0.0057, GBP: 1.15, CHF: 1.07 };
 
-        const PROXIES = [
-            url => "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
-            url => "https://corsproxy.io/?" + encodeURIComponent(url)
+        async function fetchConTimeout(url, ms = 8000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), ms);
+            try {
+                return await fetch(url, { signal: controller.signal });
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        const FONTI = [
+            async d => {
+                const r = await fetchConTimeout("https://api.frankfurter.dev/v1/latest?base=" + d + "&symbols=EUR");
+                if (!r.ok) throw new Error("HTTP " + r.status);
+                const j = await r.json();
+                return { tasso: j.rates.EUR, data: j.date };
+            },
+            async d => {
+                const r = await fetchConTimeout("https://open.er-api.com/v6/latest/" + d);
+                if (!r.ok) throw new Error("HTTP " + r.status);
+                const j = await r.json();
+                return { tasso: j.rates.EUR, data: (j.time_last_update_utc || "").slice(5, 16) };
+            },
+            async d => {
+                const c = d.toLowerCase();
+                const r = await fetchConTimeout("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/" + c + ".json");
+                if (!r.ok) throw new Error("HTTP " + r.status);
+                const j = await r.json();
+                return { tasso: j[c].eur, data: j.date };
+            },
+            async d => {
+                const url = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
+                const r = await fetchConTimeout("https://corsproxy.io/?" + encodeURIComponent(url));
+                if (!r.ok) throw new Error("HTTP " + r.status);
+                const xml = new DOMParser().parseFromString(await r.text(), "text/xml");
+                const celle = xml.getElementsByTagName("Cube");
+                let data = "";
+                for (let i = 0; i < celle.length; i++) {
+                    if (celle[i].getAttribute("time")) data = celle[i].getAttribute("time");
+                    if (celle[i].getAttribute("currency") === d) {
+                        return { tasso: 1 / parseFloat(celle[i].getAttribute("rate")), data: data };
+                    }
+                }
+                throw new Error("valuta non trovata");
+            }
         ];
 
-        async function scaricaXML() {
-            for (const proxy of PROXIES) {
+        async function ottieniTasso(divisa) {
+            for (let i = 0; i < FONTI.length; i++) {
                 try {
-                    const risposta = await fetch(proxy(URL_BCE));
-                    if (!risposta.ok) continue;
-                    const testo = await risposta.text();
-                    const xml = new DOMParser().parseFromString(testo, "text/xml");
-                    if (xml.getElementsByTagName("Cube").length > 0) {
-                        return xml;
-                    }
+                    const esito = await FONTI[i](divisa);
+                    if (esito.tasso && isFinite(esito.tasso)) return esito;
                 } catch (e) {
+                    console.warn("Fonte " + (i + 1) + " fallita:", e.message);
                 }
             }
-            throw new Error("Impossibile scaricare i tassi di cambio.");
+            return { tasso: TASSI_RISERVA[divisa], data: null, riserva: true };
         }
 
         async function converti() {
@@ -160,29 +198,16 @@
 
             risultato.textContent = "Calcolo in corso...";
 
-            try {
-                const xml = await scaricaXML();
-                const righe = xml.getElementsByTagName("Cube");
-                let tasso = null;
+            const { tasso, data, riserva } = await ottieniTasso(divisaScelta);
+            const totale = importo * tasso;
 
-                for (let i = 0; i < righe.length; i++) {
-                    if (righe[i].getAttribute("currency") === divisaScelta) {
-                        tasso = parseFloat(righe[i].getAttribute("rate"));
-                        break;
-                    }
-                }
-
-                if (tasso === null) {
-                    risultato.textContent = "Tasso non trovato per " + divisaScelta + ".";
-                    return;
-                }
-
-                const totale = importo / tasso;
-                risultato.textContent =
-                    importo + " " + divisaScelta + " valgono " + totale.toFixed(2) + " EUR";
-            } catch (errore) {
-                risultato.textContent = "Errore: " + errore.message;
+            let testo = importo + " " + divisaScelta + " valgono " + totale.toFixed(2) + " EUR";
+            if (riserva) {
+                testo += " (valore approssimativo: tassi online non raggiungibili)";
+            } else if (data) {
+                testo += " (tasso del " + data + ")";
             }
+            risultato.textContent = testo;
         }
     </script>
 
