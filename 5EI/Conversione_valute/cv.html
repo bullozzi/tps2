@@ -31,6 +31,7 @@
     <h2 id="risultato"></h2>
 
     <script>
+
         function converti() {
 
             var quantita = document.getElementById("quantita").value;
@@ -42,15 +43,22 @@
                 return;
             }
 
+            var url = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
+
+            var proxy = "https://api.allorigins.win/raw?url=";
+
             var xhr = new XMLHttpRequest();
 
-            xhr.open("GET", "valute.php", true);
+            xhr.open("GET", proxy + encodeURIComponent(url), true);
+
+            xhr.overrideMimeType("text/xml");
 
             xhr.onload = function() {
 
                 if (xhr.status == 200 && xhr.responseXML) {
 
                     var xml = xhr.responseXML;
+
                     var dati = xml.getElementsByTagName("Cube");
 
                     for (var i = 0; i < dati.length; i++) {
@@ -73,18 +81,21 @@
                         "Valuta non trovata";
 
                 } else {
+
                     document.getElementById("risultato").innerHTML =
-                        "Errore nel caricamento del file XML";
+                        "Errore nel caricamento XML";
                 }
             };
 
             xhr.onerror = function() {
+
                 document.getElementById("risultato").innerHTML =
                     "Errore di connessione";
             };
 
             xhr.send();
         }
+
     </script>
 
 </body>
