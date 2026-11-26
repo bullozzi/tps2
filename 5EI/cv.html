@@ -3,13 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <title>Convertitore Valute</title>
+    <style>
+        html {
+            min-height: 100%;
+            background: linear-gradient(135deg, #1e3c72, #2a5298 55%, #4b79c9);
+        }
+
+        body {
+            max-width: 420px;
+            margin: 60px auto;
+            padding: 32px 30px;
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+            color: #25324a;
+            box-sizing: border-box;
+        }
+
+        br {
+            display: none;
+        }
+
+        h2 {
+            margin: 0 0 24px;
+            text-align: center;
+            font-size: 1.7rem;
+            color: #1e3c72;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #5a6b8c;
+        }
+
+        input,
+        select {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 12px 14px;
+            border: 2px solid #dbe3f1;
+            border-radius: 10px;
+            background: #f7f9fd;
+            font-size: 1rem;
+            color: #25324a;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #2a5298;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2a5298, #4b79c9);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(42, 82, 152, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        #risultato {
+            margin: 24px 0 0;
+            padding: 0;
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #1e3c72;
+            line-height: 1.4;
+        }
+
+        #risultato:not(:empty) {
+            padding: 16px;
+            background: #eef3fc;
+            border-left: 5px solid #2a5298;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
 
     <h2>Convertitore in Euro</h2>
 
     <label for="quantita">Quanto vuoi convertire?</label>
-    <input type="number" id="quantita" placeholder="Es. 50">
+    <input type="number" id="quantita" placeholder="Es. 50" min="0" step="any">
     <br><br>
 
     <label for="divisa">Da quale valuta?</label>
@@ -26,26 +125,63 @@
     <h3 id="risultato"></h3>
 
     <script>
-        function converti() {
-            var importo = document.getElementById("quantita").value;
-            var divisaScelta = document.getElementById("divisa").value;
+        const URL_BCE = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
 
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "https://proxy.cors.dev/https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml", false);
-            xhttp.send();
+        const PROXIES = [
+            url => "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
+            url => "https://corsproxy.io/?" + encodeURIComponent(url)
+        ];
 
-            var xml = xhttp.responseXML;
-            var righe = xml.getElementsByTagName("Cube");
-
-            for (var i = 2; i < righe.length; i++) {
-                var valuta = righe[i].attributes[0].value;
-                var tasso = righe[i].attributes[1].value;
-
-                if (valuta == divisaScelta) {
-                    var totale = importo / tasso;
-                    document.getElementById("risultato").innerHTML = 
-                        importo + " " + divisaScelta + " valgono " + totale + " EUR";
+        async function scaricaXML() {
+            for (const proxy of PROXIES) {
+                try {
+                    const risposta = await fetch(proxy(URL_BCE));
+                    if (!risposta.ok) continue;
+                    const testo = await risposta.text();
+                    const xml = new DOMParser().parseFromString(testo, "text/xml");
+                    if (xml.getElementsByTagName("Cube").length > 0) {
+                        return xml;
+                    }
+                } catch (e) {
                 }
+            }
+            throw new Error("Impossibile scaricare i tassi di cambio.");
+        }
+
+        async function converti() {
+            const risultato = document.getElementById("risultato");
+            const importo = parseFloat(document.getElementById("quantita").value);
+            const divisaScelta = document.getElementById("divisa").value;
+
+            if (isNaN(importo) || importo < 0) {
+                risultato.textContent = "Inserisci un importo valido.";
+                return;
+            }
+
+            risultato.textContent = "Calcolo in corso...";
+
+            try {
+                const xml = await scaricaXML();
+                const righe = xml.getElementsByTagName("Cube");
+                let tasso = null;
+
+                for (let i = 0; i < righe.length; i++) {
+                    if (righe[i].getAttribute("currency") === divisaScelta) {
+                        tasso = parseFloat(righe[i].getAttribute("rate"));
+                        break;
+                    }
+                }
+
+                if (tasso === null) {
+                    risultato.textContent = "Tasso non trovato per " + divisaScelta + ".";
+                    return;
+                }
+
+                const totale = importo / tasso;
+                risultato.textContent =
+                    importo + " " + divisaScelta + " valgono " + totale.toFixed(2) + " EUR";
+            } catch (errore) {
+                risultato.textContent = "Errore: " + errore.message;
             }
         }
     </script>
